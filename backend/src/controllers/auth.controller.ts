@@ -32,11 +32,13 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: "20d" }
     );
 
-    res.json({
-      message: "Login successful",
-      token,
-      role: user.role, 
-    });
+   res.json({
+  message: "Login successful",
+  token,
+  role: user.role,
+  username: user.username, // ✅ add this
+  email: user.email,       // ✅ add this
+});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

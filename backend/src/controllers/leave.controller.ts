@@ -93,7 +93,7 @@ export const getAllLeaves = async (req: any, res: Response) => {
     orderBy: { createdAt: "desc" },
     include: {
       user: {
-        select: { username: true },
+        select: { username: true, role: true },
       },
     },
   });
@@ -110,4 +110,26 @@ export const getMyLeaves = async (req: any, res: Response) => {
   });
 
   res.json(leaves);
+};
+
+export const getLeaveCounts = async (req: any, res: Response) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const pending = await prisma.leave.count({ where: { status: "PENDING" } });
+
+    const approvedToday = await prisma.leave.count({
+      where: {
+        status: "APPROVED",
+        updatedAt: { gte: today, lt: tomorrow },
+      },
+    });
+
+    res.json({ pending, approvedToday });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
