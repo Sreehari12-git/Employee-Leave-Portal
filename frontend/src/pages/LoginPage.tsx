@@ -14,14 +14,15 @@ export default function LoginPage() {
 
     try {
       const data = await loginUser(email, password);
-      
-      
-     localStorage.setItem("token", data.token);
+
+      localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("email", data.email || email);
       localStorage.setItem("username", data.username ?? "User");
+
+      // ✅ ADMIN → /admin/dashboard, everyone else → /user
       if (data.role === "ADMIN") {
-        navigate("/admin");
+        navigate("/admin/dashboard");
       } else {
         navigate("/user");
       }
@@ -29,7 +30,6 @@ export default function LoginPage() {
       setError(err.message);
     }
   };
-  
 
   return (
     <div style={{ display: "flex", justifyContent: "center", marginTop: "100px" }}>
@@ -47,7 +47,7 @@ export default function LoginPage() {
         <div style={{ marginBottom: "12px" }}>
           <label>Email</label>
           <input
-            type="text"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={{ width: "100%", padding: "8px", marginTop: "4px" }}

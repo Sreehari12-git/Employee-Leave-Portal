@@ -15,22 +15,22 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/addemployee" element={<AddEmployee/>}/>
-         <Route path="/attendance" element={<Attendance/>}/>
-        <Route path="/teamstatus" element={<TeamDirectory/>}/> 
-        <Route path="/leaverequests" element={<LeaveApproval />} />
 
         <Route
           path="/admin/*"
           element={
             <ProtectedRoute allowedRole="ADMIN">
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", minHeight: "100vh" }}>
                 <Sidebar />
-                <div style={{ padding: "20px", flex: 1 }}>
+                <div style={{ flex: 1, overflow: "auto" }}>
                   <Routes>
-                    <Route path="" element={<AdminDashboard />} />
-                    <Route path="attendance" element={<Attendance />} />
-                    <Route path="team" element={<TeamDirectory/>}/>
+                    {/* /admin → redirect to /admin/dashboard */}
+                    <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route path="dashboard"    element={<AdminDashboard />} />
+                    <Route path="attendance"   element={<Attendance />} />
+                    <Route path="team"         element={<TeamDirectory />} />
+                    <Route path="leaves"       element={<LeaveApproval />} />
+                    <Route path="add-employee" element={<AddEmployee />} />
                   </Routes>
                 </div>
               </div>

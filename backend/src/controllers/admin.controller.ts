@@ -29,7 +29,7 @@ export const getDashboard = async (req: any, res: Response) => {
   // 👥 team presence
   const onlineUsers = await prisma.attendance.count({
     where: {
-      checkOut: null,
+      clockOut: null,
     },
   });
 
@@ -38,7 +38,7 @@ export const getDashboard = async (req: any, res: Response) => {
   // 📜 recent logs
   const logs = await prisma.attendance.findMany({
     take: 5,
-    orderBy: { checkIn: "desc" },
+    orderBy: { clockIn: "desc" },
     include: {
       user: {
         select: { username: true },
@@ -50,9 +50,9 @@ export const getDashboard = async (req: any, res: Response) => {
     greeting: `Good morning, ${user?.username}`,
 
     attendance: {
-      checkIn: attendance?.checkIn,
-      checkOut: attendance?.checkOut,
-      isClockedIn: attendance && !attendance.checkOut,
+      checkIn: attendance?.clockIn,
+      checkOut: attendance?.clockOut,
+      isClockedIn: attendance && !attendance.clockOut,
       duration: attendance?.duration,
     },
 

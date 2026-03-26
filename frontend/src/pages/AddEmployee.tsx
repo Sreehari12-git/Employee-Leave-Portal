@@ -52,15 +52,15 @@ export default function AddEmployee() {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "500px",
-        backgroundColor: "#f8f8f8",
-        padding: "30px",
-        borderRadius: "20px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
-      }}
-    >
+  <div style={{
+  padding: "32px",
+  backgroundColor: "#f0f2f5",
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "flex-start",
+  paddingTop: "48px",
+}}>
       <h2 style={{ marginBottom: "20px", color: "#002f66" }}>Add Employee</h2>
 
       <form onSubmit={handleSubmit}>
