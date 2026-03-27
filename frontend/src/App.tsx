@@ -8,7 +8,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AddEmployee from "./pages/AddEmployee";
 import TeamDirectory from "./components/TeamDirectory";
 import LeaveApproval from "./pages/LeaveApproval";
-
+import ApplyLeave from "./pages/ApplyLeave";
+import { UserSidebar } from "./components/Sidebar/UserSidebar";
 function App() {
   return (
     <BrowserRouter>
@@ -37,15 +38,23 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route
-          path="/user"
-          element={
-            <ProtectedRoute allowedRole="USER">
-              <UserDashboard />
+<Route
+  path="/user/*"
+  element={
+      <ProtectedRoute allowedRole="USER">
+              <div style={{ display: "flex", minHeight: "100vh" }}>
+                <UserSidebar /> {/* ✅ sidebar always visible */}
+                <div style={{ flex: 1, overflow: "auto" }}>
+                  <Routes>
+                    <Route path=""            element={<UserDashboard />} />
+                    <Route path="attendance"  element={<Attendance />} />
+                    <Route path="apply-leave" element={<ApplyLeave />} />
+                  </Routes>
+                </div>
+              </div>
             </ProtectedRoute>
-          }
-        />
+  }
+/>
       </Routes>
     </BrowserRouter>
   );

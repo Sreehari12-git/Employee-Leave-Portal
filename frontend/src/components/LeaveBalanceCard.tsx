@@ -3,6 +3,8 @@ type LeaveBalanceCardProps = {
   annualUsed: number;
   sickTotal: number;
   sickUsed: number;
+  // remoteTotal: number,
+  // remoteUsed: number,
   onRequestTimeOff?: () => void;
 };
 

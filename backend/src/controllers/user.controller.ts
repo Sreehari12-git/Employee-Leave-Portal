@@ -6,7 +6,6 @@ import bcrypt from "bcrypt";
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body;
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -15,6 +14,14 @@ export const createUser = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         role,
+        leaveBalance: {
+          create: {
+            annualTotal: 15,
+            annualUsed: 0,
+            sickTotal: 10,
+            sickUsed: 0,
+          },
+        },
       },
     });
 

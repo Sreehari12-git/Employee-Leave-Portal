@@ -13,7 +13,7 @@ function daysBetween(start: string, end: string) {
 
 export default function LeaveApproval() {
   const [leaves, setLeaves] = useState<any[]>([]);
-  const [counts, setCounts] = useState({ pending: 0, approvedToday: 0 });
+  const [counts, setCounts] = useState({ pending: 0, approvedToday: 0, urgent: 0 });
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
@@ -23,8 +23,10 @@ export default function LeaveApproval() {
       fetch(`${API}/leave/all`, { headers }),
       fetch(`${API}/leave/counts`, { headers }),
     ]);
-    setLeaves(await leavesRes.json());
-    setCounts(await countsRes.json());
+    const leavesData = await leavesRes.json();
+    const countsData = await countsRes.json();
+    if (Array.isArray(leavesData)) setLeaves(leavesData);
+    if (countsData) setCounts(countsData);
   };
 
   useEffect(() => { fetchData(); }, []);
@@ -35,7 +37,7 @@ export default function LeaveApproval() {
       headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       body: JSON.stringify({ leaveId, status: "APPROVED" }),
     });
-    fetchData();
+    fetchData(); // ✅ refresh after approve
   };
 
   const handleReject = async (leaveId: number) => {
@@ -46,13 +48,11 @@ export default function LeaveApproval() {
     });
     setRejectingId(null);
     setRejectReason("");
-    fetchData();
+    fetchData(); // ✅ refresh after reject
   };
 
   return (
     <div style={{ padding: "32px", backgroundColor: "#f0f2f5", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
-
-      {/* Header */}
       <div style={{ marginBottom: "28px" }}>
         <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", margin: "0 0 4px" }}>Approval Queue</h1>
         <p style={{ fontSize: "14px", color: "#64748b", margin: 0 }}>Review and manage leave requests from your team.</p>
@@ -61,10 +61,10 @@ export default function LeaveApproval() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "32px" }}>
         {[
-          { label: "Pending", value: counts.pending, bg: "#eff6ff", iconBg: "#dbeafe", color: "#1d4ed8", icon: "📋" },
-          { label: "Approved Today", value: counts.approvedToday, bg: "#f0fdf4", iconBg: "#dcfce7", color: "#16a34a", icon: "✅" },
-          { label: "Urgent Review", value: leaves.filter(l => l.type === "SICK").length, bg: "#fff1f2", iconBg: "#ffe4e6", color: "#dc2626", icon: "❗" },
-        ].map(({ label, value, bg, iconBg, color, icon }) => (
+          { label: "Pending",        value: counts.pending,       iconBg: "#dbeafe", icon: "📋" },
+          { label: "Approved Today", value: counts.approvedToday, iconBg: "#dcfce7", icon: "✅" },
+          { label: "Urgent Review",  value: counts.urgent ?? 0,   iconBg: "#ffe4e6", icon: "❗" },
+        ].map(({ label, value, iconBg, icon }) => (
           <div key={label} style={{ backgroundColor: "#fff", borderRadius: "16px", padding: "24px", display: "flex", alignItems: "center", gap: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
             <div style={{ width: "52px", height: "52px", borderRadius: "12px", backgroundColor: iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>
               {icon}
@@ -72,17 +72,16 @@ export default function LeaveApproval() {
             <div>
               <p style={{ fontSize: "13px", color: "#64748b", margin: "0 0 4px", fontWeight: 500 }}>{label}</p>
               <p style={{ fontSize: "28px", fontWeight: 800, color: "#0f172a", margin: 0 }}>
-                {String(value).padStart(2, "0")}
+                {String(value ?? 0).padStart(2, "0")}
               </p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Pending Requests */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
         <h2 style={{ fontSize: "17px", fontWeight: 700, color: "#0f172a", margin: 0 }}>Pending Requests</h2>
-        <span style={{ fontSize: "13px", color: "#94a3b8" }}>Showing 1-{leaves.length} of {leaves.length}</span>
+        <span style={{ fontSize: "13px", color: "#94a3b8" }}>Showing {leaves.length} of {leaves.length}</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -103,12 +102,11 @@ export default function LeaveApproval() {
               borderRadius: "16px",
               overflow: "hidden",
               boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-              borderLeft: isUrgent ? "4px solid #dc2626" : "none",
+              borderLeft: isUrgent ? "4px solid #dc2626" : "4px solid transparent",
             }}>
-              {/* Main row */}
               <div style={{
                 display: "grid",
-                gridTemplateColumns: "2fr 1.5fr 1.5fr 1fr auto",
+                gridTemplateColumns: "2fr 1.5fr 1.5fr auto auto",
                 alignItems: "center",
                 padding: "20px 24px",
                 gap: "24px",
@@ -131,12 +129,9 @@ export default function LeaveApproval() {
 
                 {/* Leave Type */}
                 <div>
-                  {isUrgent && (
-                    <p style={{ fontSize: "10px", fontWeight: 700, color: "#dc2626", letterSpacing: "0.08em", margin: "0 0 4px" }}>URGENT: MEDICAL</p>
-                  )}
-                  {!isUrgent && (
-                    <p style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.08em", margin: "0 0 4px" }}>LEAVE TYPE</p>
-                  )}
+                  <p style={{ fontSize: "10px", fontWeight: 700, color: isUrgent ? "#dc2626" : "#94a3b8", letterSpacing: "0.08em", margin: "0 0 4px" }}>
+                    {isUrgent ? "URGENT: MEDICAL" : "LEAVE TYPE"}
+                  </p>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: isUrgent ? "#dc2626" : "#3b82f6", display: "inline-block" }} />
                     <span style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a" }}>{leave.type}</span>
@@ -152,7 +147,7 @@ export default function LeaveApproval() {
                   </p>
                 </div>
 
-                {/* Approve button */}
+                {/* ✅ Approve button */}
                 <button
                   onClick={() => handleApprove(leave.id)}
                   style={{
@@ -160,12 +155,13 @@ export default function LeaveApproval() {
                     backgroundColor: "#14532d", color: "#fff",
                     fontSize: "14px", fontWeight: 700, cursor: "pointer",
                     display: "flex", alignItems: "center", gap: "6px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   ✓ Approve
                 </button>
 
-                {/* Reject X */}
+                {/* ✅ Reject button */}
                 <button
                   onClick={() => setRejectingId(isRejecting ? null : leave.id)}
                   style={{

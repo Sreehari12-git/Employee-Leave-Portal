@@ -64,5 +64,8 @@ model LeaveBalance {
   sickTotal    Int @default(10)
   sickUsed     Int @default(0)
 
+  remoteTotal Int @default(10)
+  remoteUsed  Int @default(0)
+
   user User @relation(fields: [userId], references: [id])
 }

@@ -36,7 +36,7 @@ export const applyLeave = async (req: any, res: Response) => {
 
 export const updateLeaveStatus = async (req: any, res: Response) => {
   try {
-    const { leaveId, status } = req.body; // APPROVED / REJECTED
+    const { leaveId, status } = req.body;
 
     const leave = await prisma.leave.findUnique({
       where: { id: leaveId },
@@ -46,42 +46,41 @@ export const updateLeaveStatus = async (req: any, res: Response) => {
       return res.status(404).json({ message: "Leave not found" });
     }
 
-    // update leave status
+    if (leave.status === "APPROVED") {
+  return res.status(400).json({
+    message: "Leave already approved",
+  });
+}
+
     const updatedLeave = await prisma.leave.update({
       where: { id: leaveId },
       data: { status },
     });
 
-    // 🔥 If approved → update balance
     if (status === "APPROVED") {
-      const days =
-        (new Date(leave.endDate).getTime() -
-          new Date(leave.startDate).getTime()) /
-          (1000 * 60 * 60 * 24) +
-        1;
-
-      const balance = await prisma.leaveBalance.findUnique({
-        where: { userId: leave.userId },
-      });
+      // ✅ normalize dates to avoid timezone issues
+      const start = new Date(leave.startDate);
+      const end = new Date(leave.endDate);
+      start.setUTCHours(0, 0, 0, 0);
+      end.setUTCHours(0, 0, 0, 0);
+      const days = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
       if (leave.type === "ANNUAL") {
-        await prisma.leaveBalance.update({
+        await prisma.leaveBalance.upsert({
           where: { userId: leave.userId },
-          data: {
-            annualUsed: (balance?.annualUsed || 0) + days,
-          },
+          update: { annualUsed: { increment: days } },
+          create: { userId: leave.userId, annualTotal: 15, annualUsed: days, sickTotal: 10, sickUsed: 0 },
         });
       } else if (leave.type === "SICK") {
-        await prisma.leaveBalance.update({
+        await prisma.leaveBalance.upsert({
           where: { userId: leave.userId },
-          data: {
-            sickUsed: (balance?.sickUsed || 0) + days,
-          },
+          update: { sickUsed: { increment: days } },
+          create: { userId: leave.userId, annualTotal: 15, annualUsed: 0, sickTotal: 10, sickUsed: days },
         });
       }
     }
 
-    res.json({ message: "Leave updated", updatedLeave });
+    res.json({ message: `Leave ${status.toLowerCase()} successfully`, updatedLeave });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -90,6 +89,7 @@ export const updateLeaveStatus = async (req: any, res: Response) => {
 
 export const getAllLeaves = async (req: any, res: Response) => {
   const leaves = await prisma.leave.findMany({
+    where: { status: "PENDING" }, // ✅ only pending
     orderBy: { createdAt: "desc" },
     include: {
       user: {
@@ -97,7 +97,6 @@ export const getAllLeaves = async (req: any, res: Response) => {
       },
     },
   });
-
   res.json(leaves);
 };
 
@@ -106,7 +105,7 @@ export const getMyLeaves = async (req: any, res: Response) => {
 
   const leaves = await prisma.leave.findMany({
     where: { userId },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "desc" }, // ✅ most recent first
   });
 
   res.json(leaves);
