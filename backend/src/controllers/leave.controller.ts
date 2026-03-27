@@ -69,14 +69,20 @@ export const updateLeaveStatus = async (req: any, res: Response) => {
         await prisma.leaveBalance.upsert({
           where: { userId: leave.userId },
           update: { annualUsed: { increment: days } },
-          create: { userId: leave.userId, annualTotal: 15, annualUsed: days, sickTotal: 10, sickUsed: 0 },
+          create: { userId: leave.userId, annualTotal: 15, annualUsed: days, sickTotal: 10, sickUsed: 0, remoteTotal: 10, remoteUsed: 0 },
         });
       } else if (leave.type === "SICK") {
         await prisma.leaveBalance.upsert({
           where: { userId: leave.userId },
           update: { sickUsed: { increment: days } },
-          create: { userId: leave.userId, annualTotal: 15, annualUsed: 0, sickTotal: 10, sickUsed: days },
+          create: { userId: leave.userId, annualTotal: 15, annualUsed: days, sickTotal: 10, sickUsed: days, remoteTotal: 10, remoteUsed: 0 },
         });
+      } else if(leave.type === "REMOTE") {
+        await prisma.leaveBalance.upsert({
+          where: { userId: leave.userId},
+          update: { remoteUsed: {increment: days}},
+          create: { userId: leave.userId, annualTotal: 15, annualUsed: days, sickTotal: 10, sickUsed: 0, remoteTotal: 10, remoteUsed: days },
+        })
       }
     }
 

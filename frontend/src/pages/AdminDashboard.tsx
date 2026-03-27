@@ -30,13 +30,16 @@ export default function AdminDashboard() {
       <SessionTimer 
       onClockedIn={() => setClockStatus("Clocked In")}
       onClockedOut={() => setClockStatus("Clocked Out")}/>
-
+      <div style={{marginTop: "24px"}}>
       <LeaveBalanceCard 
         annualTotal={15}
         annualUsed={0}
         sickTotal={10}
         sickUsed={0}
+        remoteTotal={10}
+        remoteUsed={0}
         />
+      </div>
     </div>
   );
 }

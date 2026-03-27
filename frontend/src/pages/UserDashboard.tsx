@@ -11,6 +11,7 @@ export default function UserDashboard() {
   const [leaveBalance, setLeaveBalance] = useState({
     annualTotal: 15, annualUsed: 0,
     sickTotal: 10, sickUsed: 0,
+    remoteTotal: 10, remoteUsed: 0,
   });
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -37,6 +38,8 @@ export default function UserDashboard() {
           annualUsed: leaveData.annualUsed ?? 0,
           sickTotal: leaveData.sickTotal ?? 10,
           sickUsed: leaveData.sickUsed ?? 0,
+          remoteTotal: leaveData.remoteTotal ?? 10,
+          remoteUsed: leaveData.remoteUsed ?? 0,
         });
       }
     };
@@ -75,6 +78,8 @@ export default function UserDashboard() {
             annualUsed={leaveBalance.annualUsed}
             sickTotal={leaveBalance.sickTotal}
             sickUsed={leaveBalance.sickUsed}
+            remoteTotal={leaveBalance.remoteTotal}
+            remoteUsed={leaveBalance.remoteUsed}
           />
 
           {/* My Attendance Summary */}

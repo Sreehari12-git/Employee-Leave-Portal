@@ -3,8 +3,8 @@ type LeaveBalanceCardProps = {
   annualUsed: number;
   sickTotal: number;
   sickUsed: number;
-  // remoteTotal: number,
-  // remoteUsed: number,
+  remoteTotal: number,
+  remoteUsed: number,
   onRequestTimeOff?: () => void;
 };
 
@@ -13,20 +13,22 @@ export default function LeaveBalanceCard({
   annualUsed,
   sickTotal,
   sickUsed,
-  onRequestTimeOff,
+  remoteTotal,
+  remoteUsed,
+  // onRequestTimeOff,
 }: LeaveBalanceCardProps) {
   const annualAvailable = annualTotal - annualUsed;
   const sickAvailable = sickTotal - sickUsed;
-
+  const remoteAvailable = remoteTotal - remoteUsed;
   const annualPercent = annualTotal > 0 ? (annualAvailable / annualTotal) * 100 : 0;
   const sickPercent = sickTotal > 0 ? (sickAvailable / sickTotal) * 100 : 0;
-
+  const remotePercent = remoteTotal > 0 ? (remoteAvailable / remoteTotal) * 100 : 0;
   return (
     <div style={{
       backgroundColor: "#fff",
       padding: "28px 28px 24px",
       borderRadius: "16px",
-      width: "40%",
+      width: "80%",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
       fontFamily: "'DM Sans', sans-serif",
     }}>
@@ -85,7 +87,30 @@ export default function LeaveBalanceCard({
         </div>
       </div>
 
-      {/* Button */}
+      {/* WFH Leave */}
+      <div style={{ marginBottom: "28px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+          <span style={{ fontSize: "14px", fontWeight: 600, color: "#334155" }}>WFH Leave</span>
+          <span style={{ fontSize: "14px", color: "#64748b" }}>
+            <strong style={{ color: "#0f172a", fontWeight: 700 }}>{remoteAvailable}</strong>
+            {" "}/ {remoteTotal} days
+          </span>
+        </div>
+        <div style={{
+          width: "100%", height: "6px",
+          backgroundColor: "#e2e8f0",
+          borderRadius: "999px", overflow: "hidden",
+        }}>
+          <div style={{
+            width: `${remotePercent}%`, height: "100%",
+            backgroundColor: "#334155",
+            borderRadius: "999px",
+            transition: "width 0.5s ease",
+          }} />
+        </div>
+      </div>
+
+      {/* Button
       <button
         onClick={onRequestTimeOff}
         style={{
@@ -101,7 +126,7 @@ export default function LeaveBalanceCard({
         onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#f1f5f9")}
       >
         Request Time Off
-      </button>
+      </button> */}
     </div>
   );
 }
