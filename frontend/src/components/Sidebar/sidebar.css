@@ -1,0 +1,127 @@
+/* Google Font import — add this in your HTML <head> */
+/* <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> */
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #f8f9fb;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px 20px;
+  border-right: 1px solid #e5e7eb;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ── Logo ── */
+.logo {
+  padding: 0 8px;
+  margin-bottom: 32px;
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.3px;
+}
+
+.logo p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+/* ── Nav menu ── */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease;
+  text-decoration: none;
+}
+
+.sidebar-item:hover {
+  background: #eff1f5;
+}
+
+.sidebar-item.active {
+  background: #e8edf7;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.sidebar-item.active .icon {
+  color: #1e40af;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+/* ── Bottom section ── */
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-top: 16px;
+}
+
+.clock-in-btn {
+  width: 100%;
+  padding: 13px;
+  background: #064e3b;       /* dark forest green from design */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.1px;
+  transition: background 0.15s ease;
+  margin-bottom: 8px;
+}
+
+.clock-in-btn:hover {
+  background: #065f46;
+}
+
+.extra {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.extra .sidebar-item {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.extra .sidebar-item:hover {
+  color: #374151;
+}
